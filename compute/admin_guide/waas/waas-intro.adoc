@@ -55,7 +55,7 @@ image::./waas_network_management.png[width=150]
 WAAS inspects all incoming requests and forwards them to the protected application if there are no malicious activities. The response from the application is in turn inspected by WAAS and sent to the user if it's not violating any rules.
 
 This way, the Inline proxy is more secure as it can stop the incoming and outgoing traffic flow, but it consumes high resources, and may also result in application outage.
-The inline proxy needs an agent (Observer) to be deployed in the environment.
+The inline proxy needs a Defender to be deployed in the environment.
 
 ==== WAAS Out-of-band
 
@@ -63,15 +63,15 @@ Out-of-band monitors both protected and unprotected workloads by inspecting the 
 
 WAAS Out-of-band can be deployed with Defender or with CSP traffic mirroring.
 
-. *WAAS out-of-band with Defender* requires an observer to be deployed in your workload environment to monitor the protected applications by using out-of-band network communication.
+. *WAAS out-of-band with Defender* needs a Defender to be deployed in your workload environment to monitor the protected applications by using out-of-band network communication.
 
 . *WAAS out-of-band with VPC traffic mirroring* is used in cases where it's not possible to install Defender for each microservice. VPC traffic mirroring extends WAAS monitoring to instances regardless of whether they have Defenders deployed or not.
 +
-A WAAS observer installed on the host instance can monitor even the unprotected applications by using the in-built traffic mirroring provided by CSP.
+This setup requires you to install a Defender on the target instance outside your workload environment, to remotely monitor even the unprotected applications on your source instance by using the in-built traffic mirroring provided by CSP.
 +
 For example, AWS VPC traffic mirroring feature copies the traffic from the source EC2 instance (with no Defender) to the target EC2 instance that has a host Defender installed within the same VPC.
 
-WAAS out-of-band setup has no latency cost. But as WAAS can't control the traffic, it can only send out alerts to the console.
+WAAS out-of-band setup has no latency cost. But as WAAS can't control the traffic, it can only send out alerts to the Prisma Console.
 
 === Where do I begin with WAAS?
 
@@ -90,14 +90,23 @@ NOTE: Prisma Cloud can also protect Fargate-based web containers.
 
 Requests that trigger a WAAS protection are subject to one of the following actions:
 
-* *Alert* - The request is passed to the protected application and an audit is generated for visibility.
+* *Alert* - The request is passed to the protected application (where, the deployed Defender has complete visibility on your workload) or unprotected application (where, there is no Defender deployed on the workload instance but on a remote instance, for example, in Out-of-band with VPC mirroring), and an audit is generated for visibility. 
++
+Both In-line and Out-of-band WAAS deployment generate alerts to the Console.
 * *Prevent* - The request is denied from reaching the protected application, an audit is generated and WAAS responds with an HTML page indicating the request was blocked.
-* *Ban* - Can be applied on either IP or <<./waas_advanced_settings.adoc#prisma_session, Prisma Session IDs>>. All requests originating from the same IP/Prisma Session to the protected application are denied for the configured time period (default is 5 minutes) following the last detected attack. 
-
++
+Supported only in WAAS In-line proxy setup.
+* *Ban* - Can be applied on either IP or <<./waas_advanced_settings.adoc#prisma_session, Prisma Session IDs>>. All requests originating from the same IP/Prisma Session to the protected application are denied for the configured time period (default is 5 minutes) following the last detected attack.
++
+Supported only in WAAS In-line proxy setup.
++
 NOTE: WAAS implements state, which is required for banning user sessions by IP address.
 Because Defenders do not share state, any application replicated across multiple nodes must enable IP stickiness on the load balancer.
+* *Disable* - The WAAS action is disabled.
++
+Supported both for WAAS In-line and WAAS Out-of-band setups.
 
-=== Supported Protocols, Message Parsers and Decoders
+=== Supported Protocols, Message Parsers, and Decoders
 
 ==== Supported Protocols
 

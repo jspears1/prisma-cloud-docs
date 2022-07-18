@@ -1,10 +1,10 @@
-== Deploying WAAS for Containers Protected By App Embedded Defender
+== Deploy WAAS for Containers Protected By App Embedded Defender
 
 In some environments, Prisma Cloud Defender must be embedded directly inside the container it is protecting. This type of Defender is known as an App Embedded Defender.
 App-Embedded Defender can secure these types of containers with all WAAS protection capabilities.
 
 The only difference is that App Embedded Defender runs as a reverse proxy to the container it's protecting.
-As such, when you set up WAAS for App sEmbedded, you must specify the exposed external port where App Embedded Defender can listen, and the port (not exposed to the Internet) where your web application listens.
+As such, when you set up WAAS for App embedded, you must specify the exposed external port where App Embedded Defender can listen, and the port (not exposed to the Internet) where your web application listens.
 WAAS for App-Embedded forwards the filtered traffic to your application's port - unless an attack is detected and you set your WAAS for App Embedded rule to *Prevent*.
 
 When testing your Prisma Cloud-protected container, be sure you update the security group's inbound rules to permit TCP connections on the external port you entered in the WAAS rule. This is the exposed port that allows you to access your web application's container.
